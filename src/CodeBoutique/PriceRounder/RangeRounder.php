@@ -12,6 +12,7 @@ class RangeRounder extends Rounder
 
     public function __construct($ranges)
     {
+        parent::__construct();
         if (!is_array($ranges)) {
             throw new \Exception("Ranges must be an array");
         }

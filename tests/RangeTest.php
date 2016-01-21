@@ -1,10 +1,10 @@
 <?php
 
+use CodeBoutique\PriceRounder\Rounder;
 use CodeBoutique\PriceRounder\RangeRounder;
 
 class RangeTest extends PHPUnit_Framework_TestCase
 {
-    private $rounder;
 
     public function testRangeWith()
     {

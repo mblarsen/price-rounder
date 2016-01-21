@@ -2,19 +2,10 @@
 
 namespace CodeBoutique\PriceRounder;
 
-class NinesRounder extends Rounder
+class NinesRounder extends CentsRounder
 {
-    private $factor;
-
-    public function __construct($factor = 0)
+    public function __construct($factor = 0, $precision = 0, $mode = Rounder::ROUND_HALF_UP)
     {
-        $this->factor = $factor;
-    }
-
-    public function round($value)
-    {
-        $multiplier = pow(10, $this->factor);
-        $value = (round($value / $multiplier) - 0.01) * $multiplier;
-        return parent::round($value);
+        parent::__construct(1, $factor, $precision, $mode);
     }
 }
