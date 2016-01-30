@@ -22,7 +22,13 @@ $data = [
     "2517.33" => [2495, 2499, 2500, 2505, 2549, 2550]
 ];
 
-$rounder = new BestPriceRounder();
+$data = [
+    "372.30" => [1],
+    "40.10" => [1],
+    "56.59" => [1]
+];
+
+$rounder = new BestPriceRounder([ "gain" => 10.0 ]);
 $rounder->printAnalysis(66.33);
 $rounder->printAnalysis(1253.2);
 

@@ -41,6 +41,15 @@ class BestPriceRounder extends Rounder
 
     private function analyze($candidates, $original)
     {
+        if (empty($original)) {
+            return [
+                "original"   => $original,
+                "best"       => 0.0,
+                "candidates" => [],
+                "edges"      => $this->edges
+            ];
+        }
+
         $original = (float) $original;
         $original_whole = floor($original);
 
@@ -65,7 +74,7 @@ class BestPriceRounder extends Rounder
 
         foreach ($this->edges as $edge => $edge_value) {
             $compare_to = null;
-            
+
             $edge_value = (float) $edge_value;
             switch ($edge) {
 
@@ -89,7 +98,7 @@ class BestPriceRounder extends Rounder
                     $compare_to = empty($compare_to) ? "8" : $compare_to;
                 case "halves":
                     $compare_to = empty($compare_to) ? "5" : $compare_to;
-                    
+
                     array_walk($rows, function (&$row, $index, $edge) {
                         $edge_value = $edge[0];
                         $compare_to = $edge[1];
@@ -128,8 +137,7 @@ class BestPriceRounder extends Rounder
         // Find the best
         $sort_rows = $rows;
         usort($sort_rows, function ($a, $b) {
-            if ($a[5] === $b[5]) return 0;
-            return $a[5] < $b[5] ? -1 : 1;
+            return $a[5] - $b[5];
         });
         $best = $sort_rows[0][0];
 
@@ -181,6 +189,10 @@ class BestPriceRounder extends Rounder
 
     private function findCandidates($value)
     {
+        if (empty($value)) {
+            return [];
+        }
+
         $value           = round($value, 2);
         $whole           = floor($value);
         $ceil            = ceil($value);
@@ -197,8 +209,6 @@ class BestPriceRounder extends Rounder
         //     "value", $value,
         //     "whole", $whole,
         //     "ceil", $ceil,
-        //     "fraction", $fraction,
-        //     "fraction_length", $fraction_length,
         //     "whole_length", $whole_length,
         //     "factor", $factor,
         //     "multiplier", $multiplier
