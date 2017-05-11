@@ -1,3 +1,5 @@
+[![Latest Stable Version](https://poser.pugx.org/codeboutique/price-rounder/v/stable)](https://packagist.org/packages/codeboutique/price-rounder) [![Total Downloads](https://poser.pugx.org/codeboutique/price-rounder/downloads)](https://packagist.org/packages/codeboutique/price-rounder) [![License](https://poser.pugx.org/codeboutique/price-rounder/license)](https://packagist.org/packages/codeboutique/price-rounder)
+
 # PriceRounder
 
 Price rounding lib producing nice prices (pretty prices) with range support. Build for making pretty prices when converting prices from other currencies.
