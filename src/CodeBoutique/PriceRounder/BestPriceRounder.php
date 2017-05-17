@@ -11,6 +11,8 @@ class BestPriceRounder extends Rounder
 
     const INCLUDE_DEFAULT = 11;
 
+    const INCLUDE_ALL = 15;
+
     protected $edges = [
         "odd"         => 3.0,
         "even"        => 1.0,

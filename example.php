@@ -29,9 +29,9 @@ $rounder->printAnalysis(1253.2);
 if (class_exists("Elkuku\Console\Helper\ConsoleTable", false)) {
     test([
         [],
-        [ "odd" => 2.5 ],
-        [ "gain" => 2.0 ],
-        [ "odd" => 2.5, "gain" => 2.0 ]
+        [ "odd" => 9.0 ],
+        [ "gain" => 9.0, 'nines' => 5 ],
+        [ "eights" => 5, 'gain' => 5 ],
     ], $data);
 }
 
@@ -52,7 +52,7 @@ function test($edges, $data)
         // $rounder->printAnalysis($base);
         $row = [ $base ];
         foreach ($edges as $set) {
-            $rounder = new BestPriceRounder($set);
+            $rounder = new BestPriceRounder($set, BestPriceRounder::INCLUDE_ALL);
             $row[] = $rounder->round($base);
         }
         $table->addRow($row);
