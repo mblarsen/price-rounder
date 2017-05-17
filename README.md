@@ -1,4 +1,4 @@
-[![Latest Stable Version](https://poser.pugx.org/codeboutique/price-rounder/v/stable)](https://packagist.org/packages/codeboutique/price-rounder) [![Total Downloads](https://poser.pugx.org/codeboutique/price-rounder/downloads)](https://packagist.org/packages/codeboutique/price-rounder) [![License](https://poser.pugx.org/codeboutique/price-rounder/license)](https://packagist.org/packages/codeboutique/price-rounder)
+[![build status](http://img.shields.io/travis/CodeBoutique/price-rounder.svg)](http://travis-ci.org/CodeBoutique/price-rounder) [![Latest Stable Version](https://poser.pugx.org/codeboutique/price-rounder/v/stable)](https://packagist.org/packages/codeboutique/price-rounder) [![Total Downloads](https://poser.pugx.org/codeboutique/price-rounder/downloads)](https://packagist.org/packages/codeboutique/price-rounder) [![License](https://poser.pugx.org/codeboutique/price-rounder/license)](https://packagist.org/packages/codeboutique/price-rounder)
 
 # PriceRounder
 
