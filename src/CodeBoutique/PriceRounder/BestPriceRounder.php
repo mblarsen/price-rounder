@@ -8,10 +8,11 @@ class BestPriceRounder extends Rounder
     const INCLUDE_NINETYFIVES = 2;
     const INCLUDE_EIGHTS = 4;
     const INCLUDE_HALVES = 8;
+    const INCLUDE_NEAR_FIVES = 16;
 
     const INCLUDE_DEFAULT = 11;
 
-    const INCLUDE_ALL = 15;
+    const INCLUDE_ALL = 31;
 
     protected $edges = [
         "odd"         => 3.0,
@@ -19,6 +20,7 @@ class BestPriceRounder extends Rounder
         "nines"       => 1.0,
         "ninetyfives" => 1.0,
         "eights"      => 1.0,
+        "near_fives"  => 0.5,
         "halves"      => 1.0,
         "gain"        => 2.5,
         "loss"        => 1.0
@@ -26,6 +28,7 @@ class BestPriceRounder extends Rounder
 
     public function __construct($edges = [], $includes = BestPriceRounder::INCLUDE_DEFAULT)
     {
+        if (!$edges) { $edges = []; }
         $unknown_edges = array_diff(array_keys($edges), array_keys($this->edges));
         if (!empty($unknown_edges)) {
             throw new \Exception("Unknown edge keys: " . join(", ", $unknown_edges));
@@ -67,7 +70,7 @@ class BestPriceRounder extends Rounder
 
         foreach ($this->edges as $edge => $edge_value) {
             $compare_to = null;
-            
+
             $edge_value = (float) $edge_value;
             switch ($edge) {
 
@@ -83,18 +86,19 @@ class BestPriceRounder extends Rounder
                     }, [ $edge_value, ($edge === "odd" ? 1 : 0) ]);
                     break;
 
+                case "near_fives":
+                    $compare_to = "5";
                 case "nines":
-                    $compare_to = "9";
+                    $compare_to = empty($compare_to) ? "9" : $compare_to;
                 case "ninetyfives":
                     $compare_to = empty($compare_to) ? "95" : $compare_to;
                 case "eights":
                     $compare_to = empty($compare_to) ? "8" : $compare_to;
                 case "halves":
                     $compare_to = empty($compare_to) ? "5" : $compare_to;
-                    
-                    array_walk($rows, function (&$row, $index, $edge) {
+
+                    array_walk($rows, function (&$row, $index, $edge) use ($compare_to) {
                         $edge_value = $edge[0];
-                        $compare_to = $edge[1];
 
                         $new_value = str_replace(".", "", (string) $row[0]);
                         $new_value = rtrim($new_value, "0");
@@ -199,42 +203,48 @@ class BestPriceRounder extends Rounder
         //     "value", $value,
         //     "whole", $whole,
         //     "ceil", $ceil,
-        //     "fraction", $fraction,
-        //     "fraction_length", $fraction_length,
+        //     "factor", $factor,
         //     "whole_length", $whole_length,
         //     "factor", $factor,
         //     "multiplier", $multiplier
         // );
-
-        $candiates = [];
+        //
+        $candidates = [];
         if (self::INCLUDE_NINES & $this->includes) {
-            $candiates[] = round(floor($whole / $multiplier) - 0.01, 2) * $multiplier;
-            $candiates[] = round(round($whole / $multiplier) - 0.01, 2) * $multiplier;
-            $candiates[] = round(ceil($value / $multiplier) - 0.51, 2) * $multiplier;
-            $candiates[] = round(ceil($value / $multiplier) - 0.01, 2) * $multiplier;
+            $candidates[] = round(floor($whole / $multiplier) - 0.01, 2) * $multiplier;
+            $candidates[] = round(round($whole / $multiplier) - 0.01, 2) * $multiplier;
+            $candidates[] = round(ceil($value / $multiplier) - 0.51, 2) * $multiplier;
+            $candidates[] = round(ceil($value / $multiplier) - 0.01, 2) * $multiplier;
         }
 
         if (self::INCLUDE_NINETYFIVES & $this->includes) {
-            $candiates[] = round(floor($whole / $multiplier) - 0.05, 2) * $multiplier;
-            $candiates[] = round(round($whole / $multiplier) - 0.05, 2) * $multiplier;
-            $candiates[] = round(ceil($value / $multiplier) - 0.05, 2) * $multiplier;
+            $candidates[] = round(floor($whole / $multiplier) - 0.05, 2) * $multiplier;
+            $candidates[] = round(round($whole / $multiplier) - 0.05, 2) * $multiplier;
+            $candidates[] = round(ceil($value / $multiplier) - 0.05, 2) * $multiplier;
         }
 
         if (self::INCLUDE_HALVES & $this->includes) {
-            $candiates[] = round(ceil($value / $multiplier) - 0.5, 1) * $multiplier;
+            $candidates[] = round(ceil($value / $multiplier) - 0.5, 1) * $multiplier;
         }
 
         if (self::INCLUDE_EIGHTS & $this->includes) {
-            $candiates[] = round(floor($whole / $multiplier) - 0.02, 2) * $multiplier;
-            $candiates[] = round(round($whole / $multiplier) - 0.02, 2) * $multiplier;
-            $candiates[] = round(ceil($value / $multiplier) - 0.52, 2) * $multiplier;
-            $candiates[] = round(ceil($value / $multiplier) - 0.02, 2) * $multiplier;
+            $candidates[] = round(floor($whole / $multiplier) - 0.02, 2) * $multiplier;
+            $candidates[] = round(round($whole / $multiplier) - 0.02, 2) * $multiplier;
+            $candidates[] = round(ceil($value / $multiplier) - 0.52, 2) * $multiplier;
+            $candidates[] = round(ceil($value / $multiplier) - 0.02, 2) * $multiplier;
         }
 
-        $candiates[] = round(ceil($value / $multiplier)) * $multiplier;
+        if (self::INCLUDE_NEAR_FIVES & $this->includes) {
+            $base = round(ceil($value / pow(10, $factor - 1)) - 0.5, 1);
+            $candidates[] = ($base - 0.5) * 10;
+            $candidates[] = $base * 10;
+            $candidates[] = ($base + 0.5) * 10;
+        }
 
-        sort($candiates);
-        $candiates = array_unique($candiates);
-        return $candiates;
+        $candidates[] = round(ceil($value / $multiplier)) * $multiplier;
+
+        sort($candidates);
+        $candidates = array_unique($candidates);
+        return $candidates;
     }
 }
